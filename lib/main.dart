@@ -4,7 +4,7 @@
  * Amol Borkar <amolborkar5@gmail.com>
  *
  * Commissioned By:
- * Ramandeep Singh
+ * Ramandeep Sethi (Sethi Digital Zone)
  *
  */
 
@@ -37,35 +37,67 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String url;
+  bool finishedLoading;
   WebViewController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    finishedLoading = false;
+    url = 'https://build-it.in';
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            widget.title,
-            style: TextStyle(fontSize: 24.0),
-          ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.replay),
-              onPressed: () {
-                _controller.reload();
+      appBar: finishedLoading
+          ? AppBar(
+              title: Text(
+                widget.title,
+                style: TextStyle(fontSize: 24.0),
+              ),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.replay),
+                  onPressed: () {
+                    _controller.reload();
+                  },
+                )
+              ],
+              leading: IconButton(
+                icon: Icon(Icons.home),
+                onPressed: () {
+                  _controller.loadUrl(url);
+                },
+              ),
+            )
+          : null,
+      body: finishedLoading
+          ? WebView(
+              onWebViewCreated: (WebViewController _c) => _controller = _c,
+              initialUrl: url,
+              javascriptMode: JavascriptMode.unrestricted,
+              onPageFinished: (String inp) {
+                print('Finished LOADING; ' + inp);
+                setState(() {
+                  finishedLoading = true;
+                });
               },
             )
-          ],
-          leading: IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () {
-              _controller.loadUrl('https://build-it.in');
-            },
-          ),
-        ),
-        body: WebView(
-          onWebViewCreated: (WebViewController _c) => _controller = _c,
-          initialUrl: 'https://build-it.in',
-          javascriptMode: JavascriptMode.unrestricted,
-        ));
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Image.asset(
+                    'assets/logo.png',
+                    height: 100.0,
+                  ),
+                  SizedBox(height: 20.0),
+                  CircularProgressIndicator(),
+                ],
+              ),
+            ),
+    );
   }
 }
