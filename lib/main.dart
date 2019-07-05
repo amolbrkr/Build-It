@@ -51,30 +51,32 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: finishedLoading
-          ? AppBar(
-              title: Text(
-                widget.title,
-                style: TextStyle(fontSize: 24.0),
-              ),
-              actions: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.replay),
+        appBar: finishedLoading
+            ? AppBar(
+                title: Text(
+                  widget.title,
+                  style: TextStyle(fontSize: 24.0),
+                ),
+                actions: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.replay),
+                    onPressed: () {
+                      _controller.reload();
+                    },
+                  )
+                ],
+                leading: IconButton(
+                  icon: Icon(Icons.home),
                   onPressed: () {
-                    _controller.reload();
+                    _controller.loadUrl(url);
                   },
-                )
-              ],
-              leading: IconButton(
-                icon: Icon(Icons.home),
-                onPressed: () {
-                  _controller.loadUrl(url);
-                },
-              ),
-            )
-          : null,
-      body: finishedLoading
-          ? WebView(
+                ),
+              )
+            : null,
+        body: IndexedStack(
+          index: finishedLoading ? 0 : 1,
+          children: <Widget>[
+            WebView(
               onWebViewCreated: (WebViewController _c) => _controller = _c,
               initialUrl: url,
               javascriptMode: JavascriptMode.unrestricted,
@@ -84,8 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   finishedLoading = true;
                 });
               },
-            )
-          : Center(
+            ),
+            Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -98,6 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-    );
+          ],
+        ));
   }
 }
