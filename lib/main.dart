@@ -81,7 +81,6 @@ class _MyHomePageState extends State<MyHomePage> {
               initialUrl: url,
               javascriptMode: JavascriptMode.unrestricted,
               onPageFinished: (String inp) {
-                print('Finished LOADING; ' + inp);
                 setState(() {
                   finishedLoading = true;
                 });
