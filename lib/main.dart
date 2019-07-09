@@ -9,7 +9,8 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+
 
 void main() => runApp(MyApp());
 
@@ -39,7 +40,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String url;
   bool finishedLoading;
-  WebViewController _controller;
+  final _webview = new FlutterWebviewPlugin();
 
   @override
   void initState() {
@@ -49,57 +50,55 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void dispose() {
+    _webview.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: finishedLoading
-            ? AppBar(
-                title: Text(
-                  widget.title,
-                  style: TextStyle(fontSize: 24.0),
-                ),
-                actions: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.replay),
-                    onPressed: () {
-                      _controller.reload();
-                    },
-                  )
-                ],
-                leading: IconButton(
-                  icon: Icon(Icons.home),
-                  onPressed: () {
-                    _controller.loadUrl(url);
-                  },
-                ),
-              )
-            : null,
-        body: IndexedStack(
-          index: finishedLoading ? 0 : 1,
+    return WebviewScaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.title,
+          style: TextStyle(fontSize: 24.0),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.replay),
+            onPressed: () {
+              _webview.reload();
+            },
+          )
+        ],
+        leading: IconButton(
+          icon: Icon(Icons.home),
+          onPressed: () {
+            _webview.reloadUrl(url);
+          },
+        ),
+      ),
+      url: url,
+      withZoom: false,
+      withJavascript: true,
+      withLocalStorage: true,
+      allowFileURLs: true,
+      geolocationEnabled: true,
+      appCacheEnabled: true,
+      hidden: true,
+      initialChild: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            WebView(
-              onWebViewCreated: (WebViewController _c) => _controller = _c,
-              initialUrl: url,
-              javascriptMode: JavascriptMode.unrestricted,
-              onPageFinished: (String inp) {
-                setState(() {
-                  finishedLoading = true;
-                });
-              },
+            Image.asset(
+              'assets/logo.png',
+              height: 100.0,
             ),
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Image.asset(
-                    'assets/logo.png',
-                    height: 100.0,
-                  ),
-                  SizedBox(height: 20.0),
-                  CircularProgressIndicator(),
-                ],
-              ),
-            ),
+            SizedBox(height: 20.0),
+            CircularProgressIndicator(),
           ],
-        ));
+        ),
+      ),
+    );
   }
 }
